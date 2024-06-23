@@ -6,8 +6,8 @@ CC="clang -target x86_64-unknown-windows -nostdlib -ffreestanding -fshort-wchar 
 LINK="clang -target x86_64-unknown-windows -ffreestanding -nostdlib -Wl,-entry:efi_main -Wl,-subsystem:efi_application -Wl,-map:./bin/boot.map -fuse-ld=lld-link"
 IMG="bin/image.img"
 MNT_DIR="mnt"
-KERNEL_CC="x86_64-elf-g++ -Ikernel -Wall -Werror -Wextra -O2 -ffreestanding -fno-exceptions -fno-rtti -nostdlib -mno-red-zone -I /usr/include -std=c++23 -c"
-KERNEL_LD="x86_64-elf-g++ -lgcc -ffreestanding -nostdlib -O2 -fno-exceptions -fno-rtti -Wl,-T kernel/linker.ld -Wl,-Map=./bin/kernel.map"
+KERNEL_CC="g++ -Ikernel -Wall -Werror -Wextra -O2 -ffreestanding -fno-exceptions -fno-rtti -nostdlib -mno-red-zone -I /usr/include -std=c++23 -c"
+KERNEL_LD="g++ -lgcc -ffreestanding -nostdlib -O2 -fno-exceptions -fno-rtti -Wl,-T kernel/linker.ld -Wl,-Map=./bin/kernel.map"
 KERNEL_ASM="nasm -felf64"
 
 
@@ -18,9 +18,8 @@ mkdir -p bin/uefi
 mkdir -p bin/kernel
 
 # Step 1: Build limine bootloader
-cp limine/BOOTX64.EFI bin/BOOTX64.EFI
-cp limine/limine.cfg bin/limine.cfg
-cp limine/limine.h kernel/limine.h
+cp kernel/BOOTX64.EFI bin/BOOTX64.EFI
+cp kernel/limine.cfg bin/limine.cfg
 
 # Step 2: Compile and link all kernel files
 compile_recursive() {
