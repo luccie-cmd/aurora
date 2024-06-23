@@ -1,0 +1,5 @@
+bin
+.vscode
+*.log
+*.py
+*.old
