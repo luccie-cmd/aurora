@@ -3,7 +3,7 @@ bits 64
 section .text
 
 global _start
-extern kernel_init
+extern KernelInit
 
 enable_sse:
     mov rax, cr0
@@ -86,6 +86,8 @@ _start:
     mov rsp,rax
 
     ; start the kernel
-    call kernel_init
+    call KernelInit
 
+
+    jmp $
     ; unreachable.
