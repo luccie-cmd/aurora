@@ -21,4 +21,4 @@ typedef struct {
 void InitIDT();
 void DisableGateIdt(int interrupt);
 void EnableGateIdt(int interrupt);
-void SetGateIdt(int interrupt, void* base, uint16_t segmentDescriptor, uint8_t flags);
+void SetGateIdt(int interrupt, void*, uint16_t segmentDescriptor, uint8_t flags);

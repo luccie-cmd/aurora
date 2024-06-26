@@ -66,5 +66,4 @@ typedef enum
         ((base) >> 24) & 0xFF,    \
     }
 
-extern void loadGDT(uint16_t limit, uint64_t base);
 void InitGDT();

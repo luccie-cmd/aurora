@@ -14,7 +14,7 @@ void StartTerminal(bool installer){
 }
 
 // Kernel initialization function
-void KernelInit() {
+extern "C" void KernelInit() {
     HalInitializeModules();
     // bool Installer = CheckInstaller();
     bool Installer = false;

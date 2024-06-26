@@ -35,7 +35,7 @@ const char* exception_strings[32] = {
 
 IsrHandler IsrHandlers[256];
 
-void InitializeIsr(){
+void InitISR(){
     ISR_InitializeGates();
     for(int i = 0; i < 256; ++i){
         EnableGateIdt(i);
@@ -47,7 +47,7 @@ void Panic(){
     while(1);
 }
 
-void HandleIsr(Registers* regs)
+extern "C" void HandleIsr(Registers* regs)
 {
     if (IsrHandlers[regs->interrupt] != NULL)
         IsrHandlers[regs->interrupt](regs);

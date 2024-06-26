@@ -31,6 +31,8 @@ static GdtEntry create_gdt_entry(uint64_t descriptor) {
 void InitTSS() {
 }
 
+extern "C" void loadGDT(uint16_t limit, uint64_t base);
+
 void InitGDT() {
     const GdtEntry null_entry = create_gdt_entry(create_descriptor(0, 0, 0));
     const GdtEntry kernel_code = create_gdt_entry(create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0)));

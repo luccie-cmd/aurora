@@ -1,6 +1,6 @@
 #include "idt.h"
 
-extern void loadIDT(IdtDescriptor* descriptor);
+extern "C" void loadIDT(IdtDescriptor* descriptor);
 
 IdtEntry idt[IDT_ENTRIES];
 IdtDescriptor idtDescriptor;
@@ -8,9 +8,11 @@ IdtDescriptor idtDescriptor;
 void DisableGateIdt(int interrupt){
     idt[interrupt].type_attr &= 0x80;
 }
+
 void EnableGateIdt(int interrupt){
     idt[interrupt].type_attr |= 0x80;
 }
+
 void SetGateIdt(int interrupt, void* base, uint16_t segmentDescriptor, uint8_t flags){
     idt[interrupt].offset_low = (uint64_t)base & 0xFFFF;
     idt[interrupt].selector = segmentDescriptor;
