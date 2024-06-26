@@ -2,13 +2,11 @@
 set -e
 
 # Variables
-CC="clang -target x86_64-unknown-windows -nostdlib -ffreestanding -fshort-wchar -mno-red-zone -I /usr/include -std=c11 -c"
-LINK="clang -target x86_64-unknown-windows -ffreestanding -nostdlib -Wl,-entry:efi_main -Wl,-subsystem:efi_application -Wl,-map:./bin/boot.map -fuse-ld=lld-link"
 IMG="bin/image.img"
 MNT_DIR="mnt"
-KERNEL_CC="g++ -Ikernel -Wall -Werror -Wextra -O2 -ffreestanding -fno-exceptions -fno-rtti -nostdlib -mno-red-zone -I /usr/include -std=c++23 -c"
-KERNEL_LD="g++ -lgcc -ffreestanding -nostdlib -O2 -fno-exceptions -fno-rtti -Wl,-T kernel/linker.ld -Wl,-Map=./bin/kernel.map"
-KERNEL_ASM="nasm -felf64"
+KERNEL_CC="gcc -Ikernel/libc -m64 -mcmodel=large -Ikernel -Wall -Werror -Wextra -O2 -ffreestanding -nostdlib -mno-red-zone -I /usr/include -std=c11 -c"
+KERNEL_LD="gcc -m64 -mcmodel=large -O2 -nostdlib -ffreestanding -std=c++20 -Wl,-T kernel/linker.ld -Wl,-Map=./bin/kernel.map"
+KERNEL_ASM="nasm -felf64 -Ikernel"
 
 
 # Step 0: Make folders and remove old ones
@@ -18,8 +16,8 @@ mkdir -p bin/uefi
 mkdir -p bin/kernel
 
 # Step 1: Build limine bootloader
-cp kernel/BOOTX64.EFI bin/BOOTX64.EFI
-cp kernel/limine.cfg bin/limine.cfg
+cp kernel/boot/BOOTX64.EFI bin/BOOTX64.EFI
+cp kernel/boot/limine.cfg bin/limine.cfg
 
 # Step 2: Compile and link all kernel files
 compile_recursive() {
@@ -32,10 +30,10 @@ compile_recursive() {
             # If it's a directory, recursively compile files inside it
             local subdir=$(basename "$file")
             compile_recursive "$source_dir/$subdir" "$target_dir/$subdir"
-        elif [ "${file##*.}" = "cc" ]; then
+        elif [ "${file##*.}" = "c" ]; then
             # If it's a .cc file, compile it
             local relative_path="${file#$source_dir/}"
-            local target_file="$target_dir/${relative_path%.cc}.o"
+            local target_file="$target_dir/${relative_path%.c}.c.o"
 
             # Create necessary directories in target path
             mkdir -p "$(dirname "$target_file")"
@@ -45,7 +43,7 @@ compile_recursive() {
             echo "Compiled: $file -> $target_file"
         elif [ "${file##*.}" = "asm" ]; then
             local relative_path="${file#$source_dir/}"
-            local target_file="$target_dir/${relative_path%.asm}.o"
+            local target_file="$target_dir/${relative_path%.asm}.asm.o"
             
             # Create necessary directories in target path
             mkdir -p "$(dirname "$target_file")"
@@ -80,6 +78,11 @@ object_files=$(find_object_files "$object_dir")
 # Link the .o files using the linker command
 echo $KERNEL_LD $object_files -o ./bin/kernel.aur
 $KERNEL_LD $object_files -o ./bin/kernel.aur
+
+if [ $1 == "compile" ]; then
+    echo "User specified only compile so exit"
+    exit 0
+fi
 
 
 # Step 3: Create an EFI System Partition and add the UEFI application
