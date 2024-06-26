@@ -30,7 +30,7 @@ compile_recursive() {
             # If it's a directory, recursively compile files inside it
             local subdir=$(basename "$file")
             compile_recursive "$source_dir/$subdir" "$target_dir/$subdir"
-        elif [ "${file##*.}" = "c" ]; then
+        elif [ "${file##*.}" = "cc" ]; then
             # If it's a .cc file, compile it
             local relative_path="${file#$source_dir/}"
             local target_file="$target_dir/${relative_path%.c}.c.o"
