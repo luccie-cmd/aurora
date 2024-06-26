@@ -4,8 +4,8 @@ set -e
 # Variables
 IMG="bin/image.img"
 MNT_DIR="mnt"
-KERNEL_CC="gcc -Ikernel/libc -m64 -mcmodel=large -Ikernel -Wall -Werror -Wextra -O2 -ffreestanding -nostdlib -mno-red-zone -I /usr/include -std=c11 -c"
-KERNEL_LD="gcc -m64 -mcmodel=large -O2 -nostdlib -ffreestanding -std=c++20 -Wl,-T kernel/linker.ld -Wl,-Map=./bin/kernel.map"
+KERNEL_CC="g++ -Ikernel/libc -m64 -mcmodel=large -Ikernel -Wall -Werror -Wextra -O2 -ffreestanding -nostdlib -mno-red-zone -I /usr/include -std=c++20 -c"
+KERNEL_LD="g++ -m64 -mcmodel=large -O2 -nostdlib -ffreestanding -std=c++20 -Wl,-T kernel/linker.ld -Wl,-Map=./bin/kernel.map"
 KERNEL_ASM="nasm -felf64 -Ikernel"
 
 
@@ -90,7 +90,7 @@ fi
 rm -f $IMG
 
 # Create a 64MB disk image
-dd if=/dev/zero of=$IMG bs=1M count=256
+dd if=/dev/zero of=$IMG bs=1M count=128
 
 # Create a partition table
 parted $IMG --script mklabel gpt
