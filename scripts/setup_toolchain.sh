@@ -2,13 +2,13 @@
 
 set -x
 
-BINUTILS_VERSION="${BINUTILS_VERSION:-2.41}"
-GCC_VERSION="${GCC_VERSION:-14.1.0}"
+BINUTILS_VERSION="${BINUTILS_VERSION:-2.34}"
+GCC_VERSION="${GCC_VERSION:-13.1.0}"
 
 BINUTILS_URL="https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz"
 GCC_URL="https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz"
 
-TARGET=x86_64-efi
+TARGET=x86_64-elf
 
 # ---------------------------
 
@@ -44,8 +44,8 @@ if [ "$OPERATION" = "build" ]; then
     BINUTILS_SRC="binutils-${BINUTILS_VERSION}"
     BINUTILS_BUILD="binutils-build-${BINUTILS_VERSION}"
 
-    # wget ${BINUTILS_URL}
-    # tar -xf binutils-${BINUTILS_VERSION}.tar.xz
+    wget ${BINUTILS_URL}
+    tar -xf binutils-${BINUTILS_VERSION}.tar.xz
 
     mkdir -p ${BINUTILS_BUILD}
     pushd ${BINUTILS_BUILD}
@@ -63,8 +63,8 @@ if [ "$OPERATION" = "build" ]; then
     GCC_SRC="gcc-${GCC_VERSION}"
     GCC_BUILD="gcc-build-${GCC_VERSION}"
 
-    # wget ${GCC_URL}
-    # tar -xf gcc-${GCC_VERSION}.tar.xz
+    wget ${GCC_URL}
+    tar -xf gcc-${GCC_VERSION}.tar.xz
     mkdir -p ${GCC_BUILD}
     pushd ${GCC_BUILD}
     ../gcc-${GCC_VERSION}/configure     \
