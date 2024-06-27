@@ -1,7 +1,7 @@
-bin
-.vscode
-limine
-scripts
+bin/
+.vscode/
+limine/
+scripts/
 *.log
 *.old
 *.py
