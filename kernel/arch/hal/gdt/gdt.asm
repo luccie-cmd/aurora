@@ -4,21 +4,26 @@ global loadTSS
 
 section .data
 gdtr:
+.limit:
     dw 0 ; limit
+.base:
     dq 0 ; base
 
 section .text
 loadGDT:
-    mov   [gdtr], di
-    mov   [gdtr+2], rsi
+    mov   [gdtr.limit], di
+    mov   [gdtr.base], rsi
+    xor ax, ax
+    mov ds, ax
     ; Load GDT pointer
     lgdt [gdtr]
+global reloadSegments
 reloadSegments:
     ; Reload CS register:
-    push 0x08                 ; Push code segment to stack, 0x08 is a stand-in for your code segment
-    lea rax, [rel .reload_CS] ; Load address of .reload_CS into rax
-    push rax                  ; Push this value to the stack
-    retfq                     ; Perform a far return, RETFQ or LRETQ depending on syntax
+    push DWORD 0x08                  ; Push code segment selector (32 bits)
+    lea rax, [rel .reload_CS]
+    push rax                   ; Push offset of code segment
+    retf                            ; Perform a far return
 .reload_CS:
     ; Reload data segment registers
     mov   ax, 0x10 ; 0x10 is a stand-in for your data segment

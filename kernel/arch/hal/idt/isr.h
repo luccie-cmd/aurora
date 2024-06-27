@@ -16,6 +16,12 @@ typedef struct
 
 typedef void (*IsrHandler)(Registers* regs);
 
-void ISR_InitializeGates();
-void InitISR();
-void RegisterHandlerIsr(int interrupt, IsrHandler handler);
+namespace arch{
+namespace hal{
+namespace idt{
+    extern "C" void HandleIsr(Registers* regs);
+    void InitISR();
+    void RegisterHandler(int interrupt, IsrHandler handler);
+}
+}
+}

@@ -70,4 +70,10 @@ typedef enum
         ((base) >> 24) & 0xFF,    \
     }
 
-void InitGDT();
+namespace arch{
+namespace hal{
+namespace gdt{
+    void InitGDT();
+}
+}
+}

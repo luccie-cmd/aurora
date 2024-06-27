@@ -22,7 +22,15 @@ typedef struct {
     IdtEntry* base;
 } __attribute__((packed)) IdtDescriptor;
 
-void InitIDT();
-void DisableGateIdt(int interrupt);
-void EnableGateIdt(int interrupt);
-void SetGateIdt(int interrupt, void*, uint16_t segmentDescriptor, uint8_t flags);
+namespace arch{
+namespace hal{
+namespace idt{
+    void InitIDT();
+    void DisableGate(int interrupt);
+    void EnableGate(int interrupt);
+    void SetGate(int interrupt, void*, uint16_t segmentDescriptor, uint8_t flags);
+    void DisableInterrupts();
+    void EnableInterrupts();
+}
+}
+}

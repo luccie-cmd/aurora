@@ -6,15 +6,28 @@
 #include "gdt/gdt.h"
 #include "idt/idt.h"
 #include "idt/isr.h"
-#include <arch/fb/fb.h>
+#include <debug.h>
 
-void HalInitializeModules(){
-    // InitGDT();
-    // InitIDT();
-    // InitISR();
-    // InitIRQ();
-    // InitFB();
-    // InitMMU();
-    // InitSyscall();
-    // InitKeyboard();
+namespace arch{
+namespace hal{
+    void Initialize(){
+        debug::Log("Initializing HAL\n");
+        debug::Log("Clearing interrupts\n");
+        idt::DisableInterrupts();
+        debug::Log("Initializing GDT\n");
+        gdt::InitGDT();
+        debug::Log("Initializing IDT\n");
+        idt::InitIDT();
+        debug::Log("Initializing ISR\n");
+        idt::InitISR();
+        debug::Log("Hal initialized correctly\n");
+        // InitIRQ();
+        // InitFB();
+        // InitMMU();
+        // InitSyscall();
+        // InitKeyboard();
+        debug::Log("Hal done storing interrupts\n");
+        idt::EnableInterrupts();
+    }
+}
 }

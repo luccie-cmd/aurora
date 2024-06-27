@@ -4,4 +4,6 @@
 
 #pragma once
 
-void debugLog(const char* fmt);
+namespace debug{
+    void Log(const char* fmt);
+}

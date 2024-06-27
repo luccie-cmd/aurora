@@ -39,29 +39,36 @@ const char* exception_strings[32] = {
 
 IsrHandler IsrHandlers[256];
 
-void InitISR(){
-    ISR_InitializeGates();
-    for(int i = 0; i < 256; ++i){
-        EnableGateIdt(i);
+namespace arch{
+namespace hal{
+namespace idt{
+    void InitializeGates();
+    void InitISR(){
+        InitializeGates();
+        for(int i = 0; i < 256; ++i){
+            EnableGate(i);
+        }
+        DisableGate(0x80);
     }
-    DisableGateIdt(0x80);
-}
 
-void Panic(){
-    while(1);
-}
+    void Panic(){
+        while(1);
+    }
 
-extern "C" void HandleIsr(Registers* regs)
-{
-    if (IsrHandlers[regs->interrupt] != NULL)
-        IsrHandlers[regs->interrupt](regs);
-    else{
-        debugLog("Unhandled interrupt\n");
-        Panic();
+    extern "C" void HandleIsr(Registers* regs)
+    {
+        if (IsrHandlers[regs->interrupt] != nullptr)
+            IsrHandlers[regs->interrupt](regs);
+        else{
+            debug::Log("Unhandled interrupt\n");
+            Panic();
+        }
+    }
+
+    void RegisterHandlerIsr(int interrupt, IsrHandler handler){
+        IsrHandlers[interrupt] = handler;
+        EnableGate(interrupt);
     }
 }
-
-void RegisterHandlerIsr(int interrupt, IsrHandler handler){
-    IsrHandlers[interrupt] = handler;
-    EnableGateIdt(interrupt);
+}
 }

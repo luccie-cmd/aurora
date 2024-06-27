@@ -19,7 +19,9 @@ void StartTerminal(bool installer){
 
 // Kernel initialization function
 extern "C" void KernelInit() {
-    HalInitializeModules();
+    debug::Log("Booted into AURORA!!!\n");
+    arch::hal::Initialize();
+    for(;;);
     // bool Installer = CheckInstaller();
     bool Installer = false;
     StartTerminal(Installer);
