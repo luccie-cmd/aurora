@@ -1,7 +1,6 @@
 bin/
 .vscode/
 limine/
-scripts/
+__pycache__
 *.log
 *.old
-*.py
