@@ -125,4 +125,5 @@ sudo losetup -d $LOOP_DEVICE
 rmdir $MNT_DIR
 
 # Step 4: Boot the image with QEMU
+echo "Booting OS"
 qemu-system-x86_64 -bios /usr/share/OVMF/OVMF_CODE.fd -m 128 -drive file=$IMG,format=raw -debugcon stdio -global isa-debugcon.iobase=0xe9

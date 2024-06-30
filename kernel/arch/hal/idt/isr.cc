@@ -65,7 +65,7 @@ namespace idt{
         }
     }
 
-    void RegisterHandlerIsr(int interrupt, IsrHandler handler){
+    void RegisterHandler(int interrupt, IsrHandler handler){
         IsrHandlers[interrupt] = handler;
         EnableGate(interrupt);
     }

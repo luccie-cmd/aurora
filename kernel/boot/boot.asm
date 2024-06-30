@@ -88,6 +88,5 @@ _start:
     ; start the kernel
     call KernelInit
 
-
     jmp $
     ; unreachable.

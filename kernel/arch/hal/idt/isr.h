@@ -5,13 +5,13 @@
 #pragma once
 #include <stdint.h>
 
-typedef struct 
-{
-    // in the reverse order they are pushed:
-    uint32_t ds;                                            // data segment pushed by us
-    uint32_t edi, esi, ebp, useless, ebx, edx, ecx, eax;    // pusha
-    uint32_t interrupt, error;                              // we push interrupt, error is pushed automatically (or our dummy)
-    uint32_t eip, cs, eflags, esp, ss;                      // pushed automatically by CPU
+typedef struct {
+    // In the reverse order they are pushed:
+    uint64_t ds;                                            // Data segment pushed by us (though rarely used in 64-bit)
+    uint64_t r15, r14, r13, r12, r11, r10, r9, r8;          // High registers
+    uint64_t rdi, rsi, rbp, rbx, rdx, rcx, rax;             // General-purpose registers
+    uint64_t interrupt, error;                              // Interrupt number and error code
+    uint64_t rip, cs, rflags, rsp, ss;                      // Pushed automatically by CPU
 } __attribute__((packed)) Registers;
 
 typedef void (*IsrHandler)(Registers* regs);
@@ -19,7 +19,6 @@ typedef void (*IsrHandler)(Registers* regs);
 namespace arch{
 namespace hal{
 namespace idt{
-    extern "C" void HandleIsr(Registers* regs);
     void InitISR();
     void RegisterHandler(int interrupt, IsrHandler handler);
 }

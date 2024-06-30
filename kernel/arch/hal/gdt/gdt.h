@@ -13,14 +13,16 @@
 #define USER_DATA   4
 #define TSS         5
 
-typedef struct {
-    uint16_t LimitLow;
-    uint16_t BaseLow;
-    uint8_t BaseMiddle;
-    uint8_t Access;
-    uint8_t FlagsLimitHi;
-    uint8_t BaseHigh;
-} __attribute__((packed)) GdtEntry;
+struct GdtEntry
+{
+    uint16_t limit_one;
+    uint16_t base_zero;
+    uint8_t base_two;
+    uint8_t access_byte;
+    uint8_t limit_two : 4;
+    uint8_t flags : 4;
+    uint8_t base_three;
+} __attribute__((packed));
 
 
 typedef struct GdtDescriptor{
@@ -60,15 +62,16 @@ typedef enum
     GDT_FLAG_GRANULARITY_4K                 = 0x80,
 } GDT_FLAGS;
 
-#define GDT_ENTRY(base, limit, access, flags) \
-    {                              \
-        (limit) & 0xFFFF,         \
-        (base) & 0xFFFF,           \
-        ((base) >> 16) & 0xFF,  \
-        (access),                   \
-        (((limit) >> 16) & 0x0F) | ((flags) << 4), \
-        ((base) >> 24) & 0xFF,    \
-    }
+#define GDT_ENTRY(_Base, _Limit, _Access, _Flags) {                    \
+    .limit_one = static_cast<uint16_t>(_Limit & 0xFFFF),               \
+    .base_zero = static_cast<uint16_t>(_Base & 0xFFFF),                \
+    .base_two = static_cast<uint8_t>((_Base & 0xFF0000) >> 16),        \
+    .access_byte = (_Access),                                          \
+    .limit_two = static_cast<uint8_t>((_Limit & 0xF0000) >> 16),       \
+    .flags = _Flags,                                                   \
+    .base_three = static_cast<uint8_t>((_Base & 0xFF000000) >> 24)     \
+}     
+
 
 namespace arch{
 namespace hal{

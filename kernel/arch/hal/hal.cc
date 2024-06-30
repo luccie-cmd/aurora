@@ -6,6 +6,7 @@
 #include "gdt/gdt.h"
 #include "idt/idt.h"
 #include "idt/isr.h"
+#include <arch/io/io.h>
 #include <debug.h>
 
 namespace arch{
@@ -20,14 +21,19 @@ namespace hal{
         idt::InitIDT();
         debug::Log("Initializing ISR\n");
         idt::InitISR();
-        debug::Log("Hal initialized correctly\n");
-        // InitIRQ();
+        // debug::Log("Initializing IRQ\n");
+        // irq::InitIRQ();
+        // debug::Log("Initializing frame buffer\n");
         // InitFB();
+        // debug::Log("Initializing MMU\n");
         // InitMMU();
+        // debug::Log("Initializing syscall\n");
         // InitSyscall();
+        // debug::Log("Initializing keyboard\n");
         // InitKeyboard();
-        debug::Log("Hal done storing interrupts\n");
+        // debug::Log("Hal storing interrupts\n");
         idt::EnableInterrupts();
+        debug::Log("Hal initialized correctly\n");
     }
 }
 }
