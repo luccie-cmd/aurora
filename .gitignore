@@ -1,4 +1,4 @@
-bin/
+out/
 .vscode/
 limine/
 __pycache__

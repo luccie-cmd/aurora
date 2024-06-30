@@ -276,8 +276,8 @@ def main():
     callCmd(f"mkdir -p {CONFIG['outDir'][0]}/kernel")
     if 'limine-uefi' in CONFIG["bootloader"]:
         print("> Copying limine stuff")
-        callCmd(f"cp kernel/boot/BOOTX64.EFI bin")
-        callCmd(f"cp kernel/boot/limine.cfg bin")
+        callCmd(f"cp kernel/boot/BOOTX64.EFI {CONFIG['outDir'][0]}")
+        callCmd(f"cp kernel/boot/limine.cfg {CONFIG['outDir'][0]}")
     else:
         print("TODO: Other bootloaders")
         exit(1)
