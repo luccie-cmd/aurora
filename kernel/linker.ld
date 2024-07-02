@@ -17,6 +17,11 @@ SECTIONS
     .text :
     {
         *(.text .text.*)
+        KEEP(*(.init))
+        KEEP(*(.fini))
+        *(.ctors)
+        *(.dtors)
+        KEEP(*(.eh_frame))
     }
 
     /* .rodata section */
@@ -31,16 +36,16 @@ SECTIONS
         *(.data .data.*)
     }
 
-    /* Dynamic section for relocations, both in its own PHDR and inside data PHDR */
-    .dynamic :
-    {
-        *(.dynamic)
-    }
-
     /* .bss section */
     .bss :
     {
         *(.bss .bss.*)
         *(COMMON)
+    }
+
+    /* Dynamic section for relocations, both in its own PHDR and inside data PHDR */
+    .dynamic :
+    {
+        *(.dynamic)
     }
 }
