@@ -131,7 +131,8 @@ elif "x86" in CONFIG.get("arch"):
     CONFIG["LDFLAGS"] += ["-m32"]
 
 def callCmd(command):
-    return os.system(command)
+    if os.system(command) != 0:
+        exit(1)
 
 def checkExtension(file: str, valid_extensions: list[str]):
     for ext in valid_extensions:
@@ -179,17 +180,19 @@ def buildASM(file):
 def buildKernel(kernel_dir: str):
     files = glob.glob(kernel_dir+'/**', recursive=True)
     CONFIG["CFLAGS"] += [f"-I{kernel_dir}"]
+    CONFIG["CFLAGS"] += [f"-I{kernel_dir}/libc"]
     CONFIG["CCFLAGS"] += [f"-I{kernel_dir}"]
+    CONFIG["CCFLAGS"] += [f"-I{kernel_dir}/libc"]
     for file in files:
         if not os.path.isfile(file):
             continue
         if not checkExtension(file, ["cc", "cpp", "c", "asm"]):
             continue
-        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"{CONFIG['outDir'][0]}/cache/{file}")):
+        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/aurora/cache/{file}")):
             continue
         callCmd(f"mkdir -p {CONFIG['outDir'][0]}/{os.path.dirname(file)}")
-        callCmd(f"mkdir -p {CONFIG['outDir'][0]}/cache/{os.path.dirname(file)}")
-        callCmd(f"cp {file} {CONFIG['outDir'][0]}/cache/{file}")
+        callCmd(f"mkdir -p /tmp/aurora/cache/{os.path.dirname(file)}")
+        callCmd(f"cp {file} /tmp/aurora/cache/{file}")
         if getExtension(file) == "cc" or getExtension(file) == "cpp":
             buildCC(file)
         elif getExtension(file) == "c":
@@ -269,6 +272,10 @@ def buildImage(out_file, boot_file, kernel_file):
     mountFs(LOOP_DEVICE, boot_file, kernel_file)
 
 def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "clean":
+            callCmd("rm -rf /tmp/aurora")
+            callCmd(f"rm -rf {CONFIG['outDir'][0]}")
     if force_rebuild:
         print("Rebuilding...")
     print("> Creating necesarry dirs")
@@ -291,6 +298,6 @@ def main():
     buildImage(f"{CONFIG['outDir'][0]}/image.img", f"{CONFIG['outDir'][0]}/BOOTX64.EFI", f"{CONFIG['outDir'][0]}/kernel.aur")
     if len(sys.argv) > 1:
         if sys.argv[1] == "run":
-            callCmd(f"qemu-system-x86_64 -bios /usr/share/OVMF/OVMF_CODE.fd -m 128 -drive file={CONFIG['outDir'][0]}/image.img,format=raw -debugcon stdio -global isa-debugcon.iobase=0xe9")
+            callCmd(f"./script/run.sh {CONFIG['outDir'][0]}")
 if __name__ == '__main__':
     main()
