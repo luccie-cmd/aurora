@@ -21,7 +21,6 @@ void StartTerminal(bool installer){
 void KernelInit() {
     DebugLog("Booted into AURORA!\n");
     HalInitialize();
-    FbScrollback(1);
     for(;;);
     // bool Installer = CheckInstaller();
     bool Installer = false;
