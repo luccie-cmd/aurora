@@ -6,6 +6,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef struct {
+    // In the reverse order they are pushed:
+    uint64_t ds;                                            // Data segment pushed by us (though rarely used in 64-bit)
+    uint64_t r15, r14, r13, r12, r11, r10, r9, r8;          // High registers
+    uint64_t rdi, rsi, rbp, rbx, rdx, rcx, rax;             // General-purpose registers
+    uint64_t interrupt, error;                              // Interrupt number and error code
+    uint64_t rip, cs, rflags, rsp, ss;                      // Pushed automatically by CPU
+} __attribute__((packed)) Registers;
+
 enum CpuidFeatures{
     CPUID_FEAT_ECX_SSE3         = 1 << 0,
     CPUID_FEAT_ECX_PCLMUL       = 1 << 1,
@@ -74,3 +83,7 @@ enum CpuidFeatures{
 void outb(uint16_t port, uint8_t value);
 bool cpuid(uint32_t function, uint32_t *eax, uint32_t* ebx, uint32_t *ecx, uint32_t* edx);
 void Panic();
+uint64_t read_msr(uint32_t msr);
+void write_msr(uint32_t msr, uint64_t value);
+void iowait();
+uint8_t inb(uint16_t port);

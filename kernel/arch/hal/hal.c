@@ -24,14 +24,14 @@ void HalInitialize(){
     InitFB();
     printf("Initializing ISR\n");
     InitISR();
+    printf("Initializing IRQ\n");
+    InitIRQ();
 //     std::printf("Initializing UEFI\n");
 //     uefi::InitUEFI();
 //     std::printf("Initializing ACPI\n");
 //     acpi::InitACPI();
 //     std::printf("Initializing MMU\n");
 //     mmu::InitMMU();
-//     std::printf("Initializing IRQ\n");
-//     irq::InitIRQ();
 //     std::printf("Initializing syscall\n");
 //     InitSyscall();
 //     std::printf("Initializing keyboard driver\n");

@@ -13,6 +13,26 @@ bool cpuid(uint32_t function, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint3
     return true;
 }
 
+void write_msr(uint32_t msr, uint64_t value) {
+    __asm__ __volatile__("wrmsr" : : "c" (msr), "A" (value));
+}
+
+uint64_t read_msr(uint32_t msr) {
+    uint64_t value;
+    __asm__ __volatile__("rdmsr" : "=A" (value) : "c" (msr));
+    return value;
+}
+
 void Panic(){
     while(1);
+}
+
+void iowait(){
+    outb(0x80, 0);
+}
+
+uint8_t inb(uint16_t port){
+    uint8_t value;
+    __asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));
+    return value;
 }
