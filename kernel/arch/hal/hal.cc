@@ -6,34 +6,41 @@
 #include "gdt/gdt.h"
 #include "idt/idt.h"
 #include "idt/isr.h"
+#include "irq/irq.h"
+#include <arch/fb/fb.h>
 #include <arch/io/io.h>
+#include <stdio.h>
 #include <debug.h>
 
 namespace arch{
 namespace hal{
     void Initialize(){
-        debug::Log("Initializing HAL\n");
-        debug::Log("Clearing interrupts\n");
+        std::printf("Initializing HAL\n");
+        std::printf("Clearing interrupts\n");
         idt::DisableInterrupts();
-        debug::Log("Initializing GDT\n");
+        std::printf("Initializing GDT\n");
         gdt::InitGDT();
-        debug::Log("Initializing IDT\n");
+        std::printf("Initializing IDT\n");
         idt::InitIDT();
-        debug::Log("Initializing ISR\n");
+        std::printf("Initializing frame buffer\n");
+        fb::InitFB();
+        std::printf("Initializing ISR\n");
         idt::InitISR();
-        // debug::Log("Initializing IRQ\n");
+        // std::printf("Initializing IRQ\n");
         // irq::InitIRQ();
-        // debug::Log("Initializing frame buffer\n");
-        // InitFB();
-        // debug::Log("Initializing MMU\n");
+        // std::printf("Initializing UEFI\n");
+        // uefi::InitUEFI();
+        // std::printf("Initializing ACPI\n");
+        // acpi::InitACPI();
+        // std::printf("Initializing MMU\n");
         // InitMMU();
-        // debug::Log("Initializing syscall\n");
+        // std::printf("Initializing syscall\n");
         // InitSyscall();
-        // debug::Log("Initializing keyboard\n");
+        // std::printf("Initializing keyboard driver\n");
         // InitKeyboard();
-        // debug::Log("Hal storing interrupts\n");
+        std::printf("Hal storing interrupts\n");
         idt::EnableInterrupts();
-        debug::Log("Hal initialized correctly\n");
+        std::printf("Hal initialized correctly\n");
     }
 }
 }
