@@ -4,8 +4,4 @@
 
 #pragma once
 
-namespace arch{
-namespace hal{
-    void Initialize();
-}
-}
+void HalInitialize();

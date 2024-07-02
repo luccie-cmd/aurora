@@ -11,12 +11,12 @@
 volatile struct limine_framebuffer_request _FramebuffersRequest = {
     .id = LIMINE_FRAMEBUFFER_REQUEST,
     .revision = 0,
-    .response = nullptr,
+    .response = NULL,
 };
 bool initialized = false;
 size_t _Fbcount = 0;
-struct limine_framebuffer** _Framebuffers = nullptr;
-struct limine_framebuffer* _MainFramebuffer = nullptr;
+struct limine_framebuffer** _Framebuffers = NULL;
+struct limine_framebuffer* _MainFramebuffer = NULL;
 uint64_t screenX, screenY;
 #define DEFAULT_COLOR 200, 200, 200
 // 8x8 font for ASCII 0..127
@@ -152,14 +152,12 @@ static const uint8_t FONT[128][8] = {
 };
 
 
-namespace arch{
-namespace fb{
     struct limine_framebuffer* frameBuffer;
     void InitFB(){
         screenX = 0;
         screenY = 0;
-        if (_FramebuffersRequest.response == nullptr){
-            debug::Log("No framebuffer found\n");
+        if (_FramebuffersRequest.response == NULL){
+            DebugLog("No framebuffer found\n");
             while(1){
                 __asm__("nop");
             }
@@ -172,13 +170,13 @@ namespace fb{
         if (_Fbcount > 0)
             _MainFramebuffer = _Framebuffers[0];
         initialized = true;
-        std::printf("Framebuffer initialized\n");
-        std::printf("Framebuffer info\n");
-        std::printf("Width: %d\n", _MainFramebuffer->width);
-        std::printf("Height: %d\n", _MainFramebuffer->height);
-        std::printf("Bpp: %d\n", _MainFramebuffer->bpp);
+        printf("Framebuffer initialized\n");
+        printf("Framebuffer info\n");
+        printf("Width: %d\n", _MainFramebuffer->width);
+        printf("Height: %d\n", _MainFramebuffer->height);
+        printf("Bpp: %d\n", _MainFramebuffer->bpp);
     }
-    void putPixel(uint64_t xpos, uint64_t ypos, uint8_t r, uint8_t g, uint8_t b){
+    void FbPutPixel(uint64_t xpos, uint64_t ypos, uint8_t r, uint8_t g, uint8_t b){
         uint64_t fbwidth = frameBuffer->width;
         uint64_t fbheight = frameBuffer->height;
         if (xpos >= fbwidth || ypos >= fbheight){
@@ -208,7 +206,7 @@ namespace fb{
         }
         size_t offset = (ypos * fbwidth + xpos) * (frameBuffer->bpp / 8);
         
-        volatile uint8_t* pixelAddress = reinterpret_cast<volatile uint8_t*>(frameBuffer->address) + offset;
+        volatile uint8_t* pixelAddress = (volatile uint8_t*)(frameBuffer->address) + offset;
         // Read the pixel value
         uint32_t pixelValue = 0;
         for (size_t i = 0; i < frameBuffer->bpp / 8; ++i)
@@ -234,17 +232,17 @@ namespace fb{
         *outg = g;
         *outb = b;
     }
-    void scrollBack(int lines){
-        for (int y = lines; y < (frameBuffer->height/8); y++)
-            for (int x = 0; x < (frameBuffer->width/8); x++){
+    void FbScrollback(int lines){
+        for (int y = lines; y < frameBuffer->height; y++)
+            for (int x = 0; x < frameBuffer->width; x++){
                 uint8_t r, g, b;
                 getColor(x, y, &r, &g, &b);
-                putPixel(x, y - lines, r, g, b);
+                FbPutPixel(x, y - lines, r, g, b);
             }
 
-        for (int y = (frameBuffer->height/8) - lines; y < (frameBuffer->height/8); y++)
-            for (int x = 0; x < (frameBuffer->width/8); x++){
-                putPixel(x, y, 0, 0, 0);
+        for (int y = frameBuffer->height - lines; y < frameBuffer->height; y++)
+            for (int x = 0; x < frameBuffer->width; x++){
+                FbPutPixel(x, y, 0, 0, 0);
             }
 
         screenY -= lines;
@@ -254,22 +252,22 @@ namespace fb{
             for(int y = 0; y < 8; ++y){
                 for(int x = 0; x < 8; ++x){
                     if(FONT[c][y] & (1 << x)){
-                        putPixel(screenX+x, screenY+y, 255, 255, 255);
+                        FbPutPixel(screenX+x, screenY+y, 255, 255, 255);
                     }
                 }
             }
             screenX+=8;
-            if (screenX >= frameBuffer->width/8)
+            if (screenX >= frameBuffer->width)
             {
                 screenY+=8;
                 screenX = 0;
             }
-            if (screenY >= frameBuffer->height/8)
-                scrollBack(1);
+            if (screenY >= frameBuffer->height)
+                FbScrollback(1);
         }
     }
-    void putc(char c){
-        arch::io::outb(0xE9, c);
+    void FbPutc(char c){
+        outb(0xE9, c);
         switch (c){
             case '\n':
                 screenX = 0;
@@ -290,5 +288,3 @@ namespace fb{
                 break;
         }
     }
-}
-}

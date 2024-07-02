@@ -92,9 +92,10 @@ if OLD_CONFIG != CONFIG:
     print("Configuration changed, rebuilding...")
 # Add some default values to the config
 CONFIG["CFLAGS"] = ['-c', '-ffreestanding']
-CONFIG["CCFLAGS"] = ['-c', '-ffreestanding']
+# if CONFIG["compiler"][0] == "clang":
+CONFIG["CFLAGS"] += ["-fmax-errors=1"]
 CONFIG["ASFLAGS"] = ['-felf64']
-CONFIG["LDFLAGS"] = ['-nostdlib', '-ffreestanding', '-flinker-output=exec']
+CONFIG["LDFLAGS"] = ['-nostdlib', '-ffreestanding']
 if "imageSize" not in CONFIG:
     CONFIG["imageSize"] = '64m'
 
@@ -102,22 +103,14 @@ if "yes" in CONFIG.get("debug"):
     CONFIG["CFLAGS"] += ["-O0"]
     CONFIG["CFLAGS"] += ["-g"]
     CONFIG["CFLAGS"] += ["-DDEBUG"]
-    CONFIG["CCFLAGS"] += ["-O0"]
-    CONFIG["CCFLAGS"] += ["-g"]
-    CONFIG["CCFLAGS"] += ["-DDEBUG"]
 else:
     CONFIG["CFLAGS"] += ["-O2"]
     CONFIG["CFLAGS"] += ["-DNDEBUG"]
-    CONFIG["CCFLAGS"] += ["-O2"]
-    CONFIG["CCFLAGS"] += ["-DNDEBUG"]
 if "x64" in CONFIG.get("arch"):
     CONFIG["CFLAGS"] += ["-m64"]
     CONFIG["CFLAGS"] += ["-mcmodel=large"]
-    CONFIG["CCFLAGS"] += ["-m64"]
-    CONFIG["CCFLAGS"] += ["-mcmodel=large"]
 elif "x86" in CONFIG.get("arch"):
     CONFIG["CFLAGS"] += ["-m32"]
-    CONFIG["CCFLAGS"] += ["-m32"]
 
 if "yes" in CONFIG.get("debug"):
     CONFIG["LDFLAGS"] += ["-O0"]
@@ -143,20 +136,6 @@ def checkExtension(file: str, valid_extensions: list[str]):
 def getExtension(file):
     return file.split(".")[-1]
 
-def buildCC(file):
-    compiler = CONFIG["compiler"][0]
-    if compiler == "gcc":
-        compiler = "g++"
-    elif compiler == "clang":
-        compiler = "clang++"
-    options = CONFIG["CCFLAGS"]
-    command = compiler + " " + file
-    for option in options:
-        command += " " + option
-    print(f"CC    {file}")
-    command += f" -o {CONFIG['outDir'][0]}/{file}.o"
-    callCmd(command)
-
 def buildC(file):
     compiler = CONFIG["compiler"][0]
     options = CONFIG["CFLAGS"]
@@ -181,28 +160,24 @@ def buildKernel(kernel_dir: str):
     files = glob.glob(kernel_dir+'/**', recursive=True)
     CONFIG["CFLAGS"] += [f"-I{kernel_dir}"]
     CONFIG["CFLAGS"] += [f"-I{kernel_dir}/libc"]
-    CONFIG["CCFLAGS"] += [f"-I{kernel_dir}"]
-    CONFIG["CCFLAGS"] += [f"-I{kernel_dir}/libc"]
     for file in files:
         if not os.path.isfile(file):
             continue
-        if not checkExtension(file, ["cc", "cpp", "c", "asm"]):
+        if not checkExtension(file, ["c", "asm"]):
             continue
         if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/aurora/cache/{file}")):
             continue
         callCmd(f"mkdir -p {CONFIG['outDir'][0]}/{os.path.dirname(file)}")
         callCmd(f"mkdir -p /tmp/aurora/cache/{os.path.dirname(file)}")
         callCmd(f"cp {file} /tmp/aurora/cache/{file}")
-        if getExtension(file) == "cc" or getExtension(file) == "cpp":
-            buildCC(file)
-        elif getExtension(file) == "c":
+        if getExtension(file) == "c":
             buildC(file)
         elif getExtension(file) == "asm":
             buildASM(file)
 
 def linkKernel(kernel_dir, linker_file):
     files = glob.glob(kernel_dir+'/**', recursive=True)
-    command = "g++"
+    command = CONFIG["compiler"][0]
     options = CONFIG["LDFLAGS"]
     for option in options:
         command += " " + option

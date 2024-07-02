@@ -4,6 +4,7 @@
 
 #pragma once
 #include <stdint.h>
+#include <stdbool.h>
 
 enum CpuidFeatures{
     CPUID_FEAT_ECX_SSE3         = 1 << 0,
@@ -70,10 +71,6 @@ enum CpuidFeatures{
     CPUID_FEAT_EDX_PBE          = 1 << 31
 };
 
-
-namespace arch{
-namespace io{
-    void outb(uint16_t port, uint8_t value);
-    bool cpuid(uint32_t function, uint32_t *eax, uint32_t* ebx, uint32_t *ecx, uint32_t* edx);
-}
-}
+void outb(uint16_t port, uint8_t value);
+bool cpuid(uint32_t function, uint32_t *eax, uint32_t* ebx, uint32_t *ecx, uint32_t* edx);
+void Panic();

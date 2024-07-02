@@ -9,7 +9,7 @@
 #include <debug.h>
 
 // Define the GDT entries
-GdtEntry Gdt[] = {
+struct GdtEntry Gdt[] = {
     GDT_ENTRY(0, 0, 0, 0),               // Null segment
     GDT_ENTRY(0, 0, 0x9A, 0xA),     // 64-bit kernel code segment
     GDT_ENTRY(0, 0, 0x92, 0xC),     // 64-bit kernel data segment
@@ -17,16 +17,10 @@ GdtEntry Gdt[] = {
     GDT_ENTRY(0, 0, 0xF2, 0xC),            // 64-bit user data segment
 };
 
-extern "C" void loadGDT(uint16_t limit, GdtEntry* base);
-extern "C" void reloadSegments();
+void loadGDT(uint16_t limit, struct GdtEntry* base);
+void reloadSegments();
 
-namespace arch{
-namespace hal{
-namespace gdt{
-    void InitGDT() {
-        loadGDT(sizeof(Gdt)-1, Gdt);
-        reloadSegments();
-    }
-}
-}
+void InitGDT() {
+    loadGDT(sizeof(Gdt)-1, Gdt);
+    reloadSegments();
 }

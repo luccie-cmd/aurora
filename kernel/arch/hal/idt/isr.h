@@ -16,11 +16,5 @@ typedef struct {
 
 typedef void (*IsrHandler)(Registers* regs);
 
-namespace arch{
-namespace hal{
-namespace idt{
-    void InitISR();
-    void RegisterHandler(int interrupt, IsrHandler handler);
-}
-}
-}
+void InitISR();
+void IsrRegisterHandler(int interrupt, IsrHandler handler);

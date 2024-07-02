@@ -12,10 +12,7 @@ extern struct limine_framebuffer* _MainFramebuffer;
 extern volatile struct limine_framebuffer_request _FramebuffersRequest;
 extern size_t _Fbcount;
 
-namespace arch{
-namespace fb{
-    void InitFB();
-    void putPixel(uint64_t x, uint64_t y, uint8_t r, uint8_t g, uint8_t b);
-    void putc(char c);
-}
-}
+void InitFB();
+void FbPutPixel(uint64_t x, uint64_t y, uint8_t r, uint8_t g, uint8_t b);
+void FbScrollback(int lines);
+void FbPutc(char c);

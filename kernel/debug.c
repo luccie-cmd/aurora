@@ -5,11 +5,9 @@
 #include "debug.h"
 #include <arch/io/io.h>
 
-namespace debug{
-    void Log(const char* fmt){
-        while(*fmt){
-            arch::io::outb(0xE9, *fmt);
-            fmt++;
-        }
+void DebugLog(const char* fmt){
+    while(*fmt){
+        outb(0xE9, *fmt);
+        fmt++;
     }
 }

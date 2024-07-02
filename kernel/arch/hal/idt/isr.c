@@ -6,6 +6,8 @@
 #include "idt.h"
 #include <stddef.h>
 #include <debug.h>
+#include <arch/io/io.h>
+#include <stdio.h>
 
 const char* exception_strings[32] = {
         "(#DE) Division Error",
@@ -39,36 +41,31 @@ const char* exception_strings[32] = {
 
 IsrHandler IsrHandlers[256];
 
-namespace arch{
-namespace hal{
-namespace idt{
-    void InitializeGates();
-    void InitISR(){
-        InitializeGates();
-        for(int i = 0; i < 256; ++i){
-            EnableGate(i);
-        }
-        DisableGate(0x80);
-    }
+void segFault(Registers* regs){
+    printf("Exception occured %s\n", exception_strings[regs->interrupt]);
+}
 
-    void Panic(){
-        while(1);
+void InitializeGates();
+void InitISR(){
+    InitializeGates();
+    for(int i = 0; i < 256; ++i){
+        IdtEnableGate(i);
     }
-
-    extern "C" void HandleIsr(Registers* regs)
-    {
-        if (IsrHandlers[regs->interrupt] != nullptr)
-            IsrHandlers[regs->interrupt](regs);
-        else{
-            debug::Log("Unhandled interrupt\n");
-            Panic();
-        }
+    for(int i = 0; i < 32; ++i){
+        IsrRegisterHandler(i, segFault);
     }
-
-    void RegisterHandler(int interrupt, IsrHandler handler){
-        IsrHandlers[interrupt] = handler;
-        EnableGate(interrupt);
+    IdtDisableGate(0x80);
+}
+void HandleIsr(Registers* regs)
+{
+    if (IsrHandlers[regs->interrupt] != NULL)
+        IsrHandlers[regs->interrupt](regs);
+    else{
+        printf("Unhandled interrupt %d\n", regs->interrupt);
+        Panic();
     }
 }
-}
+void IsrRegisterHandler(int interrupt, IsrHandler handler){
+    IsrHandlers[interrupt] = handler;
+    IdtEnableGate(interrupt);
 }

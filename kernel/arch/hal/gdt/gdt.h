@@ -25,10 +25,10 @@ struct GdtEntry
 } __attribute__((packed));
 
 
-typedef struct GdtDescriptor{
+struct GdtDescriptor{
     uint16_t Limit;                     // sizeof(Gdt) - 1
-    GdtEntry* Ptr;
-} __attribute__((packed)) GdtDescriptor;
+    struct GdtEntry* Ptr;
+} __attribute__((packed));
 
 typedef enum
 {
@@ -63,20 +63,13 @@ typedef enum
 } GDT_FLAGS;
 
 #define GDT_ENTRY(_Base, _Limit, _Access, _Flags) {                    \
-    .limit_one = static_cast<uint16_t>(_Limit & 0xFFFF),               \
-    .base_zero = static_cast<uint16_t>(_Base & 0xFFFF),                \
-    .base_two = static_cast<uint8_t>((_Base & 0xFF0000) >> 16),        \
+    .limit_one = (uint16_t)(_Limit & 0xFFFF),               \
+    .base_zero = (uint16_t)(_Base & 0xFFFF),                \
+    .base_two = (uint8_t)((_Base & 0xFF0000) >> 16),        \
     .access_byte = (_Access),                                          \
-    .limit_two = static_cast<uint8_t>((_Limit & 0xF0000) >> 16),       \
+    .limit_two = (uint8_t)((_Limit & 0xF0000) >> 16),       \
     .flags = _Flags,                                                   \
-    .base_three = static_cast<uint8_t>((_Base & 0xFF000000) >> 24)     \
+    .base_three = (uint8_t)((_Base & 0xFF000000) >> 24)     \
 }     
 
-
-namespace arch{
-namespace hal{
-namespace gdt{
-    void InitGDT();
-}
-}
-}
+void InitGDT();
