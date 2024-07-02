@@ -155,7 +155,7 @@ static const uint8_t FONT[128][8] = {
     struct limine_framebuffer* frameBuffer;
     void InitFB(){
         screenX = 0;
-        screenY = 0;
+        screenY = 2;
         if (_FramebuffersRequest.response == NULL){
             DebugLog("No framebuffer found\n");
             while(1){
@@ -259,11 +259,11 @@ static const uint8_t FONT[128][8] = {
             screenX+=8;
             if (screenX >= frameBuffer->width)
             {
-                screenY+=8;
+                screenY+=10;
                 screenX = 0;
             }
             if (screenY >= frameBuffer->height)
-                FbScrollback(1);
+                FbScrollback(10);
         }
     }
     void FbPutc(char c){
@@ -271,7 +271,7 @@ static const uint8_t FONT[128][8] = {
         switch (c){
             case '\n':
                 screenX = 0;
-                screenY+=8;
+                screenY+=10;
                 break;
 
             case '\t':
