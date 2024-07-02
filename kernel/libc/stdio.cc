@@ -7,10 +7,11 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <arch/fb/fb.h>
+#include <debug.h>
 
 namespace std{
     int putc(char c){
-        FbPutc(c);
+        arch::fb::putc(c);
         return 1;
     }
     
