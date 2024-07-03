@@ -6,7 +6,7 @@
 #include <cpuid.h>
 
 void outb(uint16_t port, uint8_t value) {
-    __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
+    __asm__ volatile ("out %1, %0" : : "a"(value), "Nd"(port));
 }
 bool cpuid(uint32_t function, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t* edx){
     __cpuid(function, eax, ebx, ecx, edx);
@@ -33,6 +33,6 @@ void iowait(){
 
 uint8_t inb(uint16_t port){
     uint8_t value;
-    __asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));
+    __asm__ volatile ("in %0, %1" : "=a"(value) : "Nd"(port));
     return value;
 }

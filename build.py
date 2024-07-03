@@ -93,7 +93,7 @@ if OLD_CONFIG != CONFIG:
 # Add some default values to the config
 CONFIG["CFLAGS"] = ['-c', '-ffreestanding']
 # if CONFIG["compiler"][0] == "clang":
-CONFIG["CFLAGS"] += ["-fmax-errors=1"]
+CONFIG["CFLAGS"] += ["-fmax-errors=1", '-masm=intel']
 CONFIG["ASFLAGS"] = ['-felf64']
 CONFIG["LDFLAGS"] = ['-nostdlib', '-ffreestanding']
 if "imageSize" not in CONFIG:

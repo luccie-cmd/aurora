@@ -297,37 +297,10 @@ isr_common:
     push r13
     push r14
     push r15
-
-    ; Push the segment registers
-    mov rax, ds
-    push rax
-    mov rax, es
-    push rax
-    mov rax, fs
-    push rax
-    mov rax, gs
-    push rax
-
-    ; Load kernel data segment descriptor
-    mov ax, 0x10       ; Kernel data segment
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
     
     ; Push pointer to stack to pass to C handler
     mov rdi, rsp       ; RDI is the first argument in 64-bit calling convention
     call HandleIsr
-
-    ; Restore segment registers
-    pop rax
-    mov gs, rax
-    pop rax
-    mov fs, rax
-    pop rax
-    mov es, rax
-    pop rax
-    mov ds, rax
 
     ; Restore registers
     pop r15
@@ -347,7 +320,7 @@ isr_common:
     pop rax
 
     ; Remove error code and interrupt number from the stack
-    add rsp, 16
+    ; add rsp, 16
 
     ; Return from interrupt
     iretq

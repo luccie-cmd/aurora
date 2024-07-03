@@ -43,6 +43,9 @@ IsrHandler IsrHandlers[256];
 
 void segFault(Registers* regs){
     printf("Exception occured %s\n", exception_strings[regs->interrupt]);
+    printf("RSOD\n");
+    Panic();
+
 }
 
 void InitializeGates();
