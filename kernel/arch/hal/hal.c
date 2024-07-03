@@ -10,6 +10,7 @@
 #include <arch/fb/fb.h>
 #include <arch/io/io.h>
 #include <stdio.h>
+#include <arch/mmu/mmu.h>
 #include <debug.h>
 
 void HalInitialize(){
@@ -26,16 +27,14 @@ void HalInitialize(){
     InitISR();
     printf("Initializing IRQ\n");
     InitIRQ();
-//     std::printf("Initializing UEFI\n");
-//     uefi::InitUEFI();
-//     std::printf("Initializing ACPI\n");
-//     acpi::InitACPI();
-//     std::printf("Initializing MMU\n");
-//     mmu::InitMMU();
-//     std::printf("Initializing syscall\n");
-//     InitSyscall();
-//     std::printf("Initializing keyboard driver\n");
-//     InitKeyboard();
+    printf("Initializing MMU\n");
+    InitMMU();
+    // printf("Initializing ACPI\n");
+    // InitACPI();
+    // std::printf("Initializing syscalls\n");
+    // InitSyscall();
+    // std::printf("Initializing keyboard driver\n");
+    // InitKeyboard();
     printf("Hal storing interrupts\n");
     IdtEnableInterrupts();
     printf("Hal initialized correctly\n");
