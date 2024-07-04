@@ -21,6 +21,4 @@ NOTE: If your want to install aurora on the main disk run the `install` command 
 When examining [build.py](build.py) you may have noticed that i put some arguments like run, clean and compile when you call `$ build.py run` it will call the run command for the OS
 
 # Licence
-Aurora is licensed under a modified version of the DWYW licence, see [LICENCE](LICENCE) for more
-the licence basically says that i don't care what you do with it but if your machine gets any damage that i'm not legally responsable.
-i added that for my own safety that if you're being neglegent that it's your own fault
+Aurora is licensed under the MIT licence, see [LICENCE](LICENCE) for more
