@@ -247,7 +247,29 @@ def buildImage(out_file, boot_file, kernel_file):
     makeFileSystem(LOOP_DEVICE)
     mountFs(LOOP_DEVICE, boot_file, kernel_file)
 
+def licence():
+    print("This software is licensed under a modified verion of the DWYW licence")
+    print("The modification includes that in no case the authors shall be held liable")
+    print("for any damages caused by the use of this software")
+    print("The licence can be found at LICENCE")
+    while True:
+        agree = input("Do you agree to this license? (yes/no): ").strip().lower()
+        if agree in ["y", "yes"]:
+            tmp_config = {
+                "licence_agree": ["yes"]
+            }
+            callCmd(f"cat LICENCE > image/.licence_agree")
+            callCmd(f"echo \"user agreed to terms and conditions\" >> image/.licence_agree")
+            return True
+        elif agree in ["n", "no"]:
+            return False
+        else:
+            print("Please respond with 'yes', 'y' or 'no', 'n'.")
+
 def main():
+    if not licence():
+        print("Must agree to the licence in order to build the program")
+        exit(1)
     if len(sys.argv) > 1:
         if sys.argv[1] == "clean":
             callCmd("rm -rf /tmp/aurora")
@@ -276,5 +298,6 @@ def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "run":
             callCmd(f"./script/run.sh {CONFIG['outDir'][0]}")
+
 if __name__ == '__main__':
     main()
