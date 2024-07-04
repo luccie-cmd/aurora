@@ -57,14 +57,13 @@ void InitISR(){
     for(int i = 0; i < 32; ++i){
         IsrRegisterHandler(i, segFault);
     }
-    IdtDisableGate(0x80);
 }
 void HandleIsr(Registers* regs)
 {
     if (IsrHandlers[regs->interrupt] != NULL)
         IsrHandlers[regs->interrupt](regs);
     else{
-        printf("Unhandled interrupt %d\n", regs->interrupt);
+        printf("Unhandled interrupt %x\n", regs->interrupt);
         Panic();
     }
 }
