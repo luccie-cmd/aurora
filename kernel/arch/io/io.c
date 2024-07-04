@@ -4,6 +4,7 @@
 
 #include "io.h"
 #include <cpuid.h>
+#include <stdio.h>
 
 void outb(uint16_t port, uint8_t value) {
     __asm__ volatile ("out %1, %0" : : "a"(value), "Nd"(port));
