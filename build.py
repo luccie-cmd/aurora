@@ -230,6 +230,7 @@ def mountFs(device, boot, kernel):
     callCmd(f"sudo mkdir -p mnt/boot")
     callCmd(f"sudo cp {boot} mnt/EFI/BOOT")
     callCmd(f"sudo cp {kernel} mnt/boot")
+    callCmd(f"sudo cp {CONFIG['outDir'][0]}/syscall.tbl mnt/boot")
     if "limine-uefi" in CONFIG["bootloader"]:
         callCmd(f"sudo cp {CONFIG['outDir'][0]}/limine.cfg mnt/boot")
     callCmd(f"sudo cp -r image/* mnt")
@@ -263,6 +264,7 @@ def main():
     else:
         print("TODO: Other bootloaders")
         exit(1)
+    callCmd(f"cp kernel/boot/syscall.tbl {CONFIG['outDir'][0]}")
     print("> Building kernel")
     buildKernel("kernel")
     print("> Linking kernel")
