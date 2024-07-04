@@ -320,7 +320,7 @@ isr_common:
     pop rax
 
     ; Remove error code and interrupt number from the stack
-    ; add rsp, 16
+    add rsp, 16
 
     ; Return from interrupt
     iretq
