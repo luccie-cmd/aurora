@@ -68,7 +68,6 @@ void GetTotalMMSize(){
 void CheckMemorySize(){
     for(int i = 0; i < limine_memmap_entry_count; i++){
         struct limine_memmap_entry *entry = limine_memmap_entries[i];
-        printf("{Base: %x Length: %x end: %x type: %d}\n", entry->base, entry->length, entry->base+entry->length, entry->type);
         switch(entry->type){
             case LIMINE_MEMMAP_USABLE:
                 useable_memory += entry->length;
