@@ -15,6 +15,7 @@ struct SyscallMeta handlersMetadata[MAX_SYSCALLS];
 
 void InitSyscall(){
     IsrRegisterHandler(0x42, HandleSyscall);
+    // TODO: Read syscall table
     // ParseSyscallTable("/boot/syscall.tbl");
 }
 
