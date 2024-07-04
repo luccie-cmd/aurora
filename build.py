@@ -248,9 +248,7 @@ def buildImage(out_file, boot_file, kernel_file):
     mountFs(LOOP_DEVICE, boot_file, kernel_file)
 
 def licence():
-    print("This software is licensed under a modified verion of the DWYW licence")
-    print("The modification includes that in no case the authors shall be held liable")
-    print("for any damages caused by the use of this software")
+    print("This software is licensed under the MIT licence")
     print("The licence can be found at LICENCE")
     while True:
         agree = input("Do you agree to this license? (yes/no): ").strip().lower()
