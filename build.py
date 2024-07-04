@@ -255,11 +255,6 @@ def licence():
     while True:
         agree = input("Do you agree to this license? (yes/no): ").strip().lower()
         if agree in ["y", "yes"]:
-            tmp_config = {
-                "licence_agree": ["yes"]
-            }
-            callCmd(f"cat LICENCE > image/.licence_agree")
-            callCmd(f"echo \"user agreed to terms and conditions\" >> image/.licence_agree")
             return True
         elif agree in ["n", "no"]:
             return False
