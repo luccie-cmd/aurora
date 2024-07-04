@@ -24,6 +24,7 @@ uint64_t read_msr(uint32_t msr) {
 }
 
 void Panic(){
+    printf("TODO: RSOD\n");
     while(1);
 }
 
