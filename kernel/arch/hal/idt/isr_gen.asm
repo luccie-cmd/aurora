@@ -302,25 +302,8 @@ isr_common:
     mov rdi, rsp       ; RDI is the first argument in 64-bit calling convention
     call HandleIsr
 
-    ; Restore registers
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rdi
-    pop rsi
-    pop rbp
-    pop rbx
-    pop rdx
-    pop rcx
-    pop rax
-
     ; Remove error code and interrupt number from the stack
-    add rsp, 16
+    add rsp, 136
 
     ; Return from interrupt
     iretq
