@@ -175,7 +175,7 @@ def buildKernel(kernel_dir: str):
         elif getExtension(file) == "asm":
             buildASM(file)
 
-def linkKernel(kernel_dir, linker_file):
+def linkKernel(kernel_dir, linker_file, libc_file):
     files = glob.glob(kernel_dir+'/**', recursive=True)
     command = CONFIG["compiler"][0]
     options = CONFIG["LDFLAGS"]
@@ -188,6 +188,7 @@ def linkKernel(kernel_dir, linker_file):
             continue
         command += " " + file
     command += f" -Wl,-T {linker_file}"
+    command += f" {libc_file}"
     if CONFIG["debug"][0] == "yes":
         command += f" -Wl,-Map={CONFIG['outDir'][0]}/kernel.map"
     command += f" -o {CONFIG['outDir'][0]}/kernel.aur"
@@ -247,6 +248,37 @@ def buildImage(out_file, boot_file, kernel_file):
     makeFileSystem(LOOP_DEVICE)
     mountFs(LOOP_DEVICE, boot_file, kernel_file)
 
+def buildLibc(directory, out_file):
+    CONFIG["CFLAGS"] += [f'-I{directory}']
+    os.makedirs(CONFIG["outDir"][0]+'/'+directory, exist_ok=True)
+    files = glob.glob(f"{directory}/**", recursive=True)
+    for file in files:
+        if not os.path.isfile(file):
+            continue
+        if not checkExtension(file, ["c", "asm"]):
+            continue
+        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/aurora/cache/{file}")):
+            continue
+        callCmd(f"mkdir -p {CONFIG['outDir'][0]}/{os.path.dirname(file)}")
+        callCmd(f"mkdir -p /tmp/aurora/cache/{os.path.dirname(file)}")
+        callCmd(f"cp {file} /tmp/aurora/cache/{file}")
+        if getExtension(file) == "c":
+            buildC(file)
+        elif getExtension(file) == "asm":
+            buildASM(file)
+    
+    files = glob.glob(f"{CONFIG['outDir'][0]}/{directory}/**", recursive=True)
+    obj_files = []
+    for file in files:
+        if not os.path.isfile(file):
+            continue
+        if not checkExtension(file, ["o"]):
+            continue
+        obj_files.append(file)
+    obj_files_str = " ".join(obj_files)
+    cmd = f"ar rcs {out_file} {obj_files_str}"
+    callCmd(cmd)
+
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "clean":
@@ -265,10 +297,12 @@ def main():
         print("TODO: Other bootloaders")
         exit(1)
     callCmd(f"cp kernel/boot/syscall.tbl {CONFIG['outDir'][0]}")
+    print("> Building LibC")
+    buildLibc("libc", f"{CONFIG['outDir'][0]}/libc.a")
     print("> Building kernel")
     buildKernel("kernel")
     print("> Linking kernel")
-    linkKernel(f"{CONFIG['outDir'][0]}/kernel", "kernel/linker.ld")
+    linkKernel(f"{CONFIG['outDir'][0]}/kernel", "kernel/linker.ld", f"{CONFIG['outDir'][0]}/libc.a")
     if len(sys.argv) > 1:
         if sys.argv[1] == "compile":
             return
