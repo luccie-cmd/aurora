@@ -16,6 +16,7 @@ enum errnoErrors {
     ENOMEMORY,
     EEXCEPTION,
     EUNHANDLEDINT,
+    EMANYDISKS,
     MAX_ERRNO,
 };
 

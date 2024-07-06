@@ -16,6 +16,7 @@ char *errnoLookup[] = {
     "No memory is avaliable",
     "Exception occured",
     "Unhandled interrupt",
+    "Too many disks for Filesystem to handle",
 };
 
 static_assert(sizeof(errnoLookup)/sizeof(errnoLookup[0]) == MAX_ERRNO, "Not all errno numbers have been declared");
