@@ -282,6 +282,7 @@ def buildLibc(directory, out_file):
     callCmd(cmd)
 
 def main():
+    basename = os.path.basename(os.path.dirname(os.path.realpath(__file__)))
     if len(sys.argv) > 1:
         if sys.argv[1] == "clean":
             callCmd(f"rm -rf /tmp/{basename}")
