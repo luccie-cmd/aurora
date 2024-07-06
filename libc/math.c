@@ -7,6 +7,7 @@
 #include <math.h>
 #include <errno.h>
 #include <stdio.h>
+#include <mt19937.h>
 
 static uint32_t next_rand = 1;
 extern void Panic();
@@ -30,8 +31,11 @@ uint64_t pow(uint64_t base, uint64_t exponent){
 }
 
 uint32_t rand(){
-    next_rand = (LCG_A * next_rand + LCG_C) % RAND_MAX;
-    return next_rand;
+#ifdef MT19937
+    return MT19937_extract_number();
+#else
+    return (LCG_A * next_rand + LCG_C) % RAND_MAX;
+#endif
 }
 
 uint32_t randRange(uint32_t max){
@@ -40,5 +44,9 @@ uint32_t randRange(uint32_t max){
 }
 
 void seed(uint32_t seed){
+#ifdef MT19937
+    MT19937_init_genrand(seed);
+#else
     next_rand = seed;
+#endif
 }

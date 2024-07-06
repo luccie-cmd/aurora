@@ -69,7 +69,8 @@ ALLOWED_CONFIG = [
     ["bootloader", ["limine-uefi"], True],
     ["outDir", [], True],
     ["imageSize", [], False],
-    ["debug", ["yes", "no"], True]
+    ["debug", ["yes", "no"], True],
+    ["mt19937", ["yes", "no"], True]
 ]
 if not checkConfig(CONFIG, ALLOWED_CONFIG):
     print("Invalid config file.")
@@ -106,6 +107,8 @@ if "yes" in CONFIG.get("debug"):
 else:
     CONFIG["CFLAGS"] += ["-O2"]
     CONFIG["CFLAGS"] += ["-DNDEBUG"]
+if "yes" in CONFIG.get("mt19937"):
+    CONFIG["CFLAGS"] += ["-DMT19937"]
 if "x64" in CONFIG.get("arch"):
     CONFIG["CFLAGS"] += ["-m64"]
     CONFIG["CFLAGS"] += ["-mcmodel=large"]
