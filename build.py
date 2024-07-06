@@ -247,22 +247,7 @@ def buildImage(out_file, boot_file, kernel_file):
     makeFileSystem(LOOP_DEVICE)
     mountFs(LOOP_DEVICE, boot_file, kernel_file)
 
-def licence():
-    print("This software is licensed under the MIT licence")
-    print("The licence can be found at LICENCE")
-    while True:
-        agree = input("Do you agree to this license? (yes/no): ").strip().lower()
-        if agree in ["y", "yes"]:
-            return True
-        elif agree in ["n", "no"]:
-            return False
-        else:
-            print("Please respond with 'yes', 'y' or 'no', 'n'.")
-
 def main():
-    if not licence() and 0:
-        print("Must agree to the licence in order to build the program")
-        exit(1)
     if len(sys.argv) > 1:
         if sys.argv[1] == "clean":
             callCmd("rm -rf /tmp/aurora")
