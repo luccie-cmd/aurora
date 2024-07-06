@@ -165,11 +165,12 @@ def buildKernel(kernel_dir: str):
             continue
         if not checkExtension(file, ["c", "asm"]):
             continue
-        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/aurora/cache/{file}")):
+        basename = os.path.basename(os.path.dirname(os.path.realpath(__file__)))
+        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/{basename}/cache/{file}")):
             continue
         callCmd(f"mkdir -p {CONFIG['outDir'][0]}/{os.path.dirname(file)}")
-        callCmd(f"mkdir -p /tmp/aurora/cache/{os.path.dirname(file)}")
-        callCmd(f"cp {file} /tmp/aurora/cache/{file}")
+        callCmd(f"mkdir -p /tmp/{basename}/cache/{os.path.dirname(file)}")
+        callCmd(f"cp {file} /tmp/{basename}/cache/{file}")
         if getExtension(file) == "c":
             buildC(file)
         elif getExtension(file) == "asm":
@@ -257,11 +258,12 @@ def buildLibc(directory, out_file):
             continue
         if not checkExtension(file, ["c", "asm"]):
             continue
-        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/aurora/cache/{file}")):
+        basename = os.path.basename(os.path.dirname(os.path.realpath(__file__)))
+        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/{basename}/cache/{file}")):
             continue
         callCmd(f"mkdir -p {CONFIG['outDir'][0]}/{os.path.dirname(file)}")
-        callCmd(f"mkdir -p /tmp/aurora/cache/{os.path.dirname(file)}")
-        callCmd(f"cp {file} /tmp/aurora/cache/{file}")
+        callCmd(f"mkdir -p /tmp/{basename}/cache/{os.path.dirname(file)}")
+        callCmd(f"cp {file} /tmp/{basename}/cache/{file}")
         if getExtension(file) == "c":
             buildC(file)
         elif getExtension(file) == "asm":
@@ -282,7 +284,7 @@ def buildLibc(directory, out_file):
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "clean":
-            callCmd("rm -rf /tmp/aurora")
+            callCmd(f"rm -rf /tmp/{basename}")
             callCmd(f"rm -rf {CONFIG['outDir'][0]}")
     if force_rebuild:
         print("Rebuilding...")
