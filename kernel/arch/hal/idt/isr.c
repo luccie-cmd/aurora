@@ -7,42 +7,44 @@
 #include <stddef.h>
 #include <debug.h>
 #include <arch/io/io.h>
+#include <errno.h>
 #include <stdio.h>
 
-const char* exception_strings[32] = {
-        "(#DE) Division Error",
-        "(#DB) Debug",
-        "(#--) Non-maskable Interrupt",
-        "(#BP) Breakpoint",
-        "(#OF) Overflow",
-        "(#BR) Bound Range Exceeded",
-        "(#UD) Invalid Opcode",
-        "(#NM) Device Not Available",
-        "(#DF) Double Fault",
-        "(#--) Coprocessor Segment Overrun",
-        "(#TS) Invalid TSS",
-        "(#NP) Segment Not Present",
-        "(#SS) Stack Segment Fault",
-        "(#GP) General Protection Fault",
-        "(#PF) Page Fault",
-        "(#--) Reserved",
-        "(#MF) x87 Floating-Point Exception",
-        "(#AC) Alignment Check",
-        "(#MC) Machine Check",
-        "(#XM) SIMD Floating-Point Exception",
-        "(#VE) Virtualization Exception",
-        "(#CP) Control Protection Exception",
+char* exception_strings[32] = {
+        "(#DE) Division Error\n",
+        "(#DB) Debug\n",
+        "(#--) Non-maskable Interrupt\n",
+        "(#BP) Breakpoint\n",
+        "(#OF) Overflow\n",
+        "(#BR) Bound Range Exceeded\n",
+        "(#UD) Invalid Opcode\n",
+        "(#NM) Device Not Available\n",
+        "(#DF) Double Fault\n",
+        "(#--) Coprocessor Segment Overrun\n",
+        "(#TS) Invalid TSS\n",
+        "(#NP) Segment Not Present\n",
+        "(#SS) Stack Segment Fault\n",
+        "(#GP) General Protection Fault\n",
+        "(#PF) Page Fault\n",
+        "(#--) Reserved\n",
+        "(#MF) x87 Floating-Point Exception\n",
+        "(#AC) Alignment Check\n",
+        "(#MC) Machine Check\n",
+        "(#XM) SIMD Floating-Point Exceptio\nn",
+        "(#VE) Virtualization Exception\n",
+        "(#CP) Control Protection Exception\n",
         "", "", "", "", "", "",
-        "(#HV) Hypervisor Injection Exception",
-        "(#VC) VMM Communication Exception",
-        "(#SX) Security Exception",
-        "(#--) Reserved"
+        "(#HV) Hypervisor Injection Exception\n",
+        "(#VC) VMM Communication Exception\n",
+        "(#SX) Security Exception\n",
+        "(#--) Reserved\n"
 };
 
 IsrHandler IsrHandlers[256];
 
 void segFault(Registers* regs){
-    printf("Exception occured %s\n", exception_strings[regs->interrupt]);
+    errno = EEXCEPTION;
+    errnoInfo = exception_strings[regs->interrupt];
     Panic();
 
 }
@@ -62,7 +64,7 @@ void HandleIsr(Registers* regs)
     if (IsrHandlers[regs->interrupt] != NULL)
         IsrHandlers[regs->interrupt](regs);
     else{
-        printf("Unhandled interrupt %x\n", regs->interrupt);
+        errno = EUNHANDLEDINT;
         Panic();
     }
 }

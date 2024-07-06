@@ -28,6 +28,7 @@ void InitMMU(){
     printf("Initing MMU\n");
     if(limine_memmap_request.response == NULL){
         printf("No memory avaliable\n");
+        errno = ENOMEMORY;
         Panic();
     }
     limine_memmap_entries = limine_memmap_request.response->entries;
@@ -103,5 +104,6 @@ void PrintMemoryInfo(){
 
 void* kmalloc(size_t size){
     printf("TODO: Kmalloc\n");
+    errno = ETODO;
     Panic();
 }

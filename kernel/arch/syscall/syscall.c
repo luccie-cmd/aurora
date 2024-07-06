@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <arch/fb/fb.h>
 #include <arch/hal/idt/isr.h>
+#include <errno.h>
 #define MAX_SYSCALLS 255
 
 struct SyscallMeta handlersMetadata[MAX_SYSCALLS];
@@ -44,6 +45,7 @@ void HandleSyscall(Registers *regs){
     } else{
         // throw a rsod
         printf("No syscall handler in place for syscall %d\n", syscall);
+        errno = ENOSYSCALLHANDLE;
         Panic();
     }
 }

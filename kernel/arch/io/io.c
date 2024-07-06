@@ -5,6 +5,7 @@
 #include "io.h"
 #include <cpuid.h>
 #include <stdio.h>
+#include "gsod/gsod.h"
 
 void outb(uint16_t port, uint8_t value) {
     __asm__ volatile ("out %1, %0" : : "a"(value), "Nd"(port));
@@ -25,7 +26,7 @@ uint64_t read_msr(uint32_t msr) {
 }
 
 void Panic(){
-    printf("TODO: RSOD\n");
+    GSOD();
     while(1);
 }
 

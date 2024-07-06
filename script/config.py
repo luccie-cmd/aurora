@@ -5,4 +5,4 @@ imageFS : 'fat32'
 imageSize : '128m'
 outDir : 'out'
 bootloader : 'limine-uefi'
-debug : yes
+debug : no

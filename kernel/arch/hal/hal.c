@@ -10,6 +10,7 @@
 #include <arch/fb/fb.h>
 #include <arch/io/io.h>
 #include <stdio.h>
+#include <arch/fs/fs.h>
 #include <arch/syscall/syscall.h>
 #include <arch/mmu/mmu.h>
 #include <debug.h>
@@ -32,8 +33,8 @@ void HalInitialize(){
     InitMMU();
     // printf("Initializing ACPI\n");
     // InitACPI();
-    // printf("Initializing File system\n");
-    // InitFS();
+    printf("Initializing File system\n");
+    InitFS();
     printf("Initializing syscalls\n");
     InitSyscall();
     // std::printf("Initializing keyboard driver\n");

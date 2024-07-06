@@ -151,140 +151,167 @@ static const uint8_t FONT[128][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}    // U+007F
 };
 
-
-    struct limine_framebuffer* frameBuffer;
-    void InitFB(){
-        screenX = 0;
-        screenY = 2;
-        if (_FramebuffersRequest.response == NULL){
-            DebugLog("No framebuffer found\n");
-            while(1){
-                __asm__("nop");
-            }
+static uint8_t fontScale = 1; // (size = scale * 8)
+struct limine_framebuffer* frameBuffer;
+void InitFB(){
+    screenX = 0;
+    screenY = 2;
+    if (_FramebuffersRequest.response == NULL){
+        DebugLog("No framebuffer found\n");
+        while(1){
+            __asm__("nop");
         }
-        _Framebuffers = _FramebuffersRequest.response->framebuffers;
-
-        _Fbcount = _FramebuffersRequest.response->framebuffer_count;
+    }
+    _Framebuffers = _FramebuffersRequest.response->framebuffers;
+    _Fbcount = _FramebuffersRequest.response->framebuffer_count;
+    _MainFramebuffer = _Framebuffers[0];
+    frameBuffer = _MainFramebuffer;
+    if (_Fbcount > 0)
         _MainFramebuffer = _Framebuffers[0];
-        frameBuffer = _MainFramebuffer;
-        if (_Fbcount > 0)
-            _MainFramebuffer = _Framebuffers[0];
-        initialized = true;
-        printf("Framebuffer initialized\n");
-        printf("Framebuffer info\n");
-        printf("Width: %d\n", _MainFramebuffer->width);
-        printf("Height: %d\n", _MainFramebuffer->height);
-        printf("Bpp: %d\n", _MainFramebuffer->bpp);
-    }
-    void FbPutPixel(uint64_t xpos, uint64_t ypos, uint8_t r, uint8_t g, uint8_t b){
-        uint64_t fbwidth = frameBuffer->width;
-        uint64_t fbheight = frameBuffer->height;
-        if (xpos >= fbwidth || ypos >= fbheight){
-            return; // Invalid pixel coordinates, exit function
+    InitFontSize(8);
+    initialized = true;
+    printf("Framebuffer initialized\n");
+    printf("Framebuffer info\n");
+    printf("Width: %d\n", _MainFramebuffer->width);
+    printf("Height: %d\n", _MainFramebuffer->height);
+    printf("Bpp: %d\n", _MainFramebuffer->bpp);
+}
+
+void InitFontSize(int size){
+    if(size % 8 != 0){
+        printf("Invalid font scaling, scaling must be a multiple of 8\n");
+        printf("Remainder: %d\n", size%8);
+        while(1){
+            __asm__("nop");
         }
-        size_t offset = (ypos * fbwidth + xpos) * (frameBuffer->bpp / 8);
-        volatile uint8_t* pixelAddress = (volatile uint8_t*)(frameBuffer->address) + offset;
-        uint8_t rShift = frameBuffer->red_mask_shift;
-        uint8_t gShift = frameBuffer->green_mask_shift;
-        uint8_t bShift = frameBuffer->blue_mask_shift;
-        uint32_t rMask = (1 << frameBuffer->red_mask_size) - 1;
-        uint32_t gMask = (1 << frameBuffer->green_mask_size) - 1;
-        uint32_t bMask = (1 << frameBuffer->blue_mask_size) - 1;
-        *(volatile uint32_t*)(pixelAddress) &= ~(rMask << rShift);
-        *(volatile uint32_t*)(pixelAddress) &= ~(gMask << gShift);
-        *(volatile uint32_t*)(pixelAddress) &= ~(bMask << bShift);
-
-        *(volatile uint32_t*)(pixelAddress) |= (r & rMask) << rShift;
-        *(volatile uint32_t*)(pixelAddress) |= (g & gMask) << gShift;
-        *(volatile uint32_t*)(pixelAddress) |= (b & bMask) << bShift;
     }
-    static void getColor(uint64_t xpos, uint64_t ypos, uint8_t *outr, uint8_t *outg, uint8_t *outb){
-        uint64_t fbwidth = frameBuffer->width;
-        uint64_t fbheight = frameBuffer->height;
-        if (xpos >= fbwidth || ypos >= fbheight){
-            return; // Invalid pixel coordinates, exit function
+    fontScale = size/8;
+}
+
+void FbPutPixel(uint64_t xpos, uint64_t ypos, uint8_t r, uint8_t g, uint8_t b){
+    uint64_t fbwidth = frameBuffer->width;
+    uint64_t fbheight = frameBuffer->height;
+    if (xpos >= fbwidth || ypos >= fbheight){
+        return; // Invalid pixel coordinates, exit function
+    }
+    size_t offset = (ypos * fbwidth + xpos) * (frameBuffer->bpp / 8);
+    volatile uint8_t* pixelAddress = (volatile uint8_t*)(frameBuffer->address) + offset;
+    uint8_t rShift = frameBuffer->red_mask_shift;
+    uint8_t gShift = frameBuffer->green_mask_shift;
+    uint8_t bShift = frameBuffer->blue_mask_shift;
+    uint32_t rMask = (1 << frameBuffer->red_mask_size) - 1;
+    uint32_t gMask = (1 << frameBuffer->green_mask_size) - 1;
+    uint32_t bMask = (1 << frameBuffer->blue_mask_size) - 1;
+    *(volatile uint32_t*)(pixelAddress) &= ~(rMask << rShift);
+    *(volatile uint32_t*)(pixelAddress) &= ~(gMask << gShift);
+    *(volatile uint32_t*)(pixelAddress) &= ~(bMask << bShift);
+    *(volatile uint32_t*)(pixelAddress) |= (r & rMask) << rShift;
+    *(volatile uint32_t*)(pixelAddress) |= (g & gMask) << gShift;
+    *(volatile uint32_t*)(pixelAddress) |= (b & bMask) << bShift;
+}
+static void getColor(uint64_t xpos, uint64_t ypos, uint8_t *outr, uint8_t *outg, uint8_t *outb){
+    uint64_t fbwidth = frameBuffer->width;
+    uint64_t fbheight = frameBuffer->height;
+    if (xpos >= fbwidth || ypos >= fbheight){
+        return; // Invalid pixel coordinates, exit function
+    }
+    size_t offset = (ypos * fbwidth + xpos) * (frameBuffer->bpp / 8);
+    
+    volatile uint8_t* pixelAddress = (volatile uint8_t*)(frameBuffer->address) + offset;
+    // Read the pixel value
+    uint32_t pixelValue = 0;
+    for (size_t i = 0; i < frameBuffer->bpp / 8; ++i)
+    {
+        pixelValue |= pixelAddress[i] << (i * 8);
+    }
+    // Extract and shift color components
+    uint8_t rShift = frameBuffer->red_mask_shift;
+    uint8_t gShift = frameBuffer->green_mask_shift;
+    uint8_t bShift = frameBuffer->blue_mask_shift;
+    uint32_t rMask = (1 << frameBuffer->red_mask_size) - 1;
+    uint32_t gMask = (1 << frameBuffer->green_mask_size) - 1;
+    uint32_t bMask = (1 << frameBuffer->blue_mask_size) - 1;
+    uint32_t r = (pixelValue >> rShift) & rMask;
+    uint32_t g = (pixelValue >> gShift) & gMask;
+    uint32_t b = (pixelValue >> bShift) & bMask;
+    // Combine the color components into a single 32-bit value
+    *outr = r;
+    *outg = g;
+    *outb = b;
+}
+void FbScrollback(int lines){
+    for (int y = lines; y < frameBuffer->height; y++)
+        for (int x = 0; x < frameBuffer->width; x++){
+            uint8_t r, g, b;
+            getColor(x, y, &r, &g, &b);
+            FbPutPixel(x, y - lines, r, g, b);
         }
-        size_t offset = (ypos * fbwidth + xpos) * (frameBuffer->bpp / 8);
-        
-        volatile uint8_t* pixelAddress = (volatile uint8_t*)(frameBuffer->address) + offset;
-        // Read the pixel value
-        uint32_t pixelValue = 0;
-        for (size_t i = 0; i < frameBuffer->bpp / 8; ++i)
-        {
-            pixelValue |= pixelAddress[i] << (i * 8);
+    for (int y = frameBuffer->height - lines; y < frameBuffer->height; y++)
+        for (int x = 0; x < frameBuffer->width; x++){
+            FbPutPixel(x, y, 0, 0, 0);
         }
-
-        // Extract and shift color components
-        uint8_t rShift = frameBuffer->red_mask_shift;
-        uint8_t gShift = frameBuffer->green_mask_shift;
-        uint8_t bShift = frameBuffer->blue_mask_shift;
-
-        uint32_t rMask = (1 << frameBuffer->red_mask_size) - 1;
-        uint32_t gMask = (1 << frameBuffer->green_mask_size) - 1;
-        uint32_t bMask = (1 << frameBuffer->blue_mask_size) - 1;
-
-        uint32_t r = (pixelValue >> rShift) & rMask;
-        uint32_t g = (pixelValue >> gShift) & gMask;
-        uint32_t b = (pixelValue >> bShift) & bMask;
-
-        // Combine the color components into a single 32-bit value
-        *outr = r;
-        *outg = g;
-        *outb = b;
-    }
-    void FbScrollback(int lines){
-        for (int y = lines; y < frameBuffer->height; y++)
-            for (int x = 0; x < frameBuffer->width; x++){
-                uint8_t r, g, b;
-                getColor(x, y, &r, &g, &b);
-                FbPutPixel(x, y - lines, r, g, b);
-            }
-
-        for (int y = frameBuffer->height - lines; y < frameBuffer->height; y++)
-            for (int x = 0; x < frameBuffer->width; x++){
-                FbPutPixel(x, y, 0, 0, 0);
-            }
-
-        screenY -= lines;
-    }
-    static void putchr(char c){
-        if(initialized){
-            for(int y = 0; y < 8; ++y){
-                for(int x = 0; x < 8; ++x){
-                    if(FONT[c][y] & (1 << x)){
-                        FbPutPixel(screenX+x, screenY+y, 255, 255, 255);
+    screenY -= lines;
+}
+static void putchr(char c, uint8_t r, uint8_t g, uint8_t b){
+    if(initialized){
+        for(int y = 0; y < 8; ++y){
+            for(int x = 0; x < 8; ++x){
+                if(FONT[c][y] & (1 << x)){
+                    for(int sy = 0; sy < fontScale; ++sy){
+                        for(int sx = 0; sx < fontScale; ++sx){
+                            FbPutPixel(screenX + x * fontScale + sx, screenY + y * fontScale + sy, r, g, b);
+                        }
                     }
                 }
             }
-            screenX+=8;
-            if (screenX >= frameBuffer->width)
-            {
-                screenY+=10;
-                screenX = 0;
-            }
-            if (screenY >= frameBuffer->height)
-                FbScrollback(10);
+        }
+        screenX += 8 * fontScale;
+        if (screenX >= frameBuffer->width){
+            screenY += (8 * fontScale) + 2;
+            screenX = 0;
+        }
+        if (screenY >= frameBuffer->height){
+            FbScrollback((8 * fontScale) + 2);
         }
     }
-    void FbPutc(char c){
-        outb(0xE9, c);
-        switch (c){
-            case '\n':
-                screenX = 0;
-                screenY+=10;
-                break;
+}
 
-            case '\t':
-                for (int i = 0; i < 4 - (screenX % 4); i++)
-                    putc(' ');
-                break;
-
-            case '\r':
-                screenX = 0;
-                break;
-
-            default:
-                putchr(c);
-                break;
-        }
+void FbPutcColor(char c, uint8_t r, uint8_t g, uint8_t b){
+    outb(0xE9, c);
+    switch (c){
+        case '\n':
+            screenX = 0;
+            screenY += (8 * fontScale) + 2;
+            break;
+        case '\t':
+            for (int i = 0; i < 4 - (screenX % (4 * fontScale)); i++)
+                putc(' ');
+            break;
+        case '\r':
+            screenX = 0;
+            break;
+        default:
+            putchr(c, r, g, b);
+            break;
     }
+}
+
+void FbPutc(char c){
+    FbPutcColor(c, 255, 255, 255);
+}
+
+uint64_t FbGetHeight(){
+    return frameBuffer->height;
+}
+uint64_t FbGetWidth(){
+    return frameBuffer->width;
+}
+void FbSetCursor(uint64_t x, uint64_t y){
+    screenX = x;
+    screenY = y;
+}
+
+void FbGetCursor(uint64_t *x, uint64_t *y){
+    *x = screenX;
+    *y = screenY;
+}
