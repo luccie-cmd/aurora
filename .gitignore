@@ -4,3 +4,4 @@ limine/
 __pycache__
 *.log
 *.old
+tmp.txt

@@ -9,6 +9,7 @@
 import os
 import glob
 import sys
+import subprocess
 from script.util import parseSize, compareFiles
 
 def readConfig(path: str) -> dict[str, list[str]]:
@@ -127,8 +128,12 @@ elif "x86" in CONFIG.get("arch"):
     CONFIG["LDFLAGS"] += ["-m32"]
 
 def callCmd(command):
-    if os.system(command) != 0:
+    # Run the command and capture the output
+    result = subprocess.run(command, capture_output=True, text=True, shell=True)
+    if result.returncode != 0:
+        print(result.stderr)
         exit(1)
+    return result.stdout
 
 def checkExtension(file: str, valid_extensions: list[str]):
     for ext in valid_extensions:
@@ -162,18 +167,21 @@ def buildASM(file):
 def buildKernel(kernel_dir: str):
     files = glob.glob(kernel_dir+'/**', recursive=True)
     CONFIG["CFLAGS"] += [f"-I{kernel_dir}"]
-    CONFIG["CFLAGS"] += [f"-I{kernel_dir}/libc"]
+    CONFIG["CFLAGS"] += [f"-Ilibc"]
     for file in files:
         if not os.path.isfile(file):
             continue
         if not checkExtension(file, ["c", "asm"]):
             continue
         basename = os.path.basename(os.path.dirname(os.path.realpath(__file__)))
-        if not force_rebuild and compareFiles(os.path.abspath(file), os.path.abspath(f"/tmp/{basename}/cache/{file}")):
+        callCmd(f"cpp -I{kernel_dir} -Ilibc {file} -o ./tmp.txt")
+        if not force_rebuild and compareFiles("./tmp.txt", os.path.abspath(f"/tmp/{basename}/cache/{file}")):
             continue
         callCmd(f"mkdir -p {CONFIG['outDir'][0]}/{os.path.dirname(file)}")
         callCmd(f"mkdir -p /tmp/{basename}/cache/{os.path.dirname(file)}")
-        callCmd(f"cp {file} /tmp/{basename}/cache/{file}")
+        # with open("./tmp.txt", "w") as f:
+        callCmd(f"cpp -I{kernel_dir} -Ilibc {file} -o ./tmp.txt")
+        callCmd(f"cp ./tmp.txt /tmp/{basename}/cache/{file}")
         if getExtension(file) == "c":
             buildC(file)
         elif getExtension(file) == "asm":
