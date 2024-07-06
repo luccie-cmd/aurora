@@ -23,6 +23,7 @@ void GSOD(){
                 greenColor = !greenColor;
             }
             uint32_t range = randRange(20);
+            seed(y+x*rand());
             if(range == 0){
                 range = 1;
             }
