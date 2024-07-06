@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include <arch/fb/fb.h>
-#include <debug.h>
+
+extern void FbPutc(char c);
 
 int putc(char c){
     FbPutc(c);

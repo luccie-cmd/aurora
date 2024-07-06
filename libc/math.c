@@ -4,12 +4,12 @@
  * See the LICENCE file for more information.
  */
 
-#include "math.h"
+#include <math.h>
 #include <errno.h>
 #include <stdio.h>
-#include <arch/io/io.h>
 
 static uint32_t next_rand = 1;
+extern void Panic();
 
 uint64_t pow(uint64_t base, uint64_t exponent){
     if (exponent == 0) {
