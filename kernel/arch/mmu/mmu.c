@@ -103,7 +103,7 @@ void PrintMemoryInfo(){
 }
 
 void* kmalloc(size_t size){
-    printf("TODO: Kmalloc\n");
     errno = ETODO;
+    errnoInfo = "Implement bitmap KMALLOC";
     Panic();
 }
