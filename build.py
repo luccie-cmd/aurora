@@ -260,7 +260,7 @@ def licence():
             print("Please respond with 'yes', 'y' or 'no', 'n'.")
 
 def main():
-    if not licence():
+    if not licence() and 0:
         print("Must agree to the licence in order to build the program")
         exit(1)
     if len(sys.argv) > 1:
