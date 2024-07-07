@@ -21,18 +21,28 @@ struct limine_memmap_request limine_memmap_request = {
         .revision = 0,
         .response = NULL
 };
+struct limine_hhdm_request limine_hhdm_request = {
+    .id = LIMINE_HHDM_REQUEST,
+    .revision = 0,
+    .response = NULL,
+};
+static uint64_t pmm_offset = 0;
 static uint8_t *bitMapAllocator = NULL;
 static size_t bitMapSize = 0, num_frames = 0;
 
 void InitMMU(){
     printf("Initing MMU\n");
     if(limine_memmap_request.response == NULL){
-        printf("No memory avaliable\n");
         errno = ENOMEMORY;
+        Panic();
+    }
+    if(limine_hhdm_request.response == NULL){
+        errno = ENOHHDM;
         Panic();
     }
     limine_memmap_entries = limine_memmap_request.response->entries;
     limine_memmap_entry_count = limine_memmap_request.response->entry_count;
+    pmm_offset = limine_hhdm_request.response->offset;
     printf("Getting total size\n");
     GetTotalMMSize();
     printf("Setting Bitmap\n");
@@ -103,6 +113,7 @@ void PrintMemoryInfo(){
     printf("Start addr: %d\n", bitMapAllocator);
     printf("Size: %d\n", bitMapSize);
     printf("Num frames: %d\n", num_frames);
+    printf("Pmm offset: %d\n", pmm_offset);
 }
 
 void* kmalloc(size_t size){
