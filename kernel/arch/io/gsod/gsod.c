@@ -17,13 +17,13 @@ bool greenColor = true;
 void GSOD(){
     uint64_t fb_width = FbGetWidth();
     uint64_t fb_heigth = FbGetHeight();
+    seed(rand()*rand());
     for(uint64_t y = 0; y < fb_heigth; ++y){
         for(uint64_t x = 0; x < fb_width; ++x){
             if(x % 20 == 0) {
                 greenColor = !greenColor;
             }
             uint32_t range = randRange(20);
-            seed(y+x*rand());
             if(range == 0){
                 range = 1;
             }

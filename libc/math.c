@@ -39,7 +39,6 @@ uint32_t rand(){
 }
 
 uint32_t randRange(uint32_t max){
-    uint32_t value = rand() % (max + 1);
     return rand() % (max + 1);
 }
 

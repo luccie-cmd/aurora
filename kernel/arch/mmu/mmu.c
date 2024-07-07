@@ -54,9 +54,12 @@ void SetBitMap(){
             break;
         }
     }
-    if(bitMapAllocator != NULL){
-        memset(bitMapAllocator, 0xFF, bitMapSize); // set all entries to used
+    if(bitMapAllocator == NULL){
+        errno = ENOMEMORY;
+        errnoInfo = "No memory avaliable for bitmap";
+        Panic();
     }
+    memset(bitMapAllocator, 0xFF, bitMapSize); // set all entries to used
 }
 
 void GetTotalMMSize(){

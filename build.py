@@ -93,13 +93,13 @@ if OLD_CONFIG != CONFIG:
     force_rebuild = True
     print("Configuration changed, rebuilding...")
 # Add some default values to the config
-CONFIG["CFLAGS"] = ['-c', '-ffreestanding']
+CONFIG["CFLAGS"] = ['-c', '-ffreestanding', '-finline-functions']
 # if CONFIG["compiler"][0] == "clang":
 CONFIG["CFLAGS"] += ["-fmax-errors=1"]
 CONFIG["ASFLAGS"] = ['-felf64']
 CONFIG["LDFLAGS"] = ['-nostdlib', '-ffreestanding']
 if "imageSize" not in CONFIG:
-    CONFIG["imageSize"] = '64m'
+    CONFIG["imageSize"] = '128m'
 
 if "yes" in CONFIG.get("debug"):
     CONFIG["CFLAGS"] += ["-O0"]

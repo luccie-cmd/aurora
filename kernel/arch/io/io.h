@@ -7,11 +7,11 @@
 #include <stdbool.h>
 
 typedef struct {
-    // In the reverse order they are pushed:
-    uint64_t r15, r14, r13, r12, r11, r10, r9, r8;          // High registers
-    uint64_t rdi, rsi, rbp, rbx, rdx, rcx, rax;             // General-purpose registers
-    uint64_t interrupt, error;                              // Interrupt number and error code
-    uint64_t rip, cs, rflags, rsp, ss;                      // Pushed automatically by CPU
+    uint64_t cr3, gs, fs, es, ds, 
+             r15, r14, r13, r12, r11, r10, r9, r8, 
+             rdi, rsi, rbp, rsp, rdx, rcx, rbx, rax, 
+             interrupt, error, 
+             rip, cs, rflags, orig_rsp, ss;
 } __attribute__((packed)) Registers;
 
 enum CpuidFeatures{

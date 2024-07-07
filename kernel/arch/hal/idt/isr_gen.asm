@@ -280,12 +280,13 @@ ISR_NOERRORCODE 253
 ISR_NOERRORCODE 254
 ISR_NOERRORCODE 255
 
+global isr_common
 isr_common:
-    ; Save registers
     push rax
+    push rbx
     push rcx
     push rdx
-    push rbx
+    push rsp
     push rbp
     push rsi
     push rdi
@@ -297,13 +298,55 @@ isr_common:
     push r13
     push r14
     push r15
-    
-    ; Push pointer to stack to pass to C handler
-    mov rdi, rsp       ; RDI is the first argument in 64-bit calling convention
+
+    xor rax, rax
+
+    mov ax, ds
+    push rax
+    mov ax, es
+    push rax
+    mov ax, fs
+    push rax
+    mov ax, gs
+    push rax
+
+    mov rax, cr3
+    push rax
+
+    cld
+
+    ; Push the address of the structure onto the stack
+    lea rdi, [rsp]   ; Address of the saved registers
     call HandleIsr
 
-    ; Remove error code and interrupt number from the stack
-    add rsp, 136
+    pop rax
+    mov cr3, rax
 
-    ; Return from interrupt
+    xor rax, rax
+    pop rax
+    mov gs, ax
+    pop rax
+    mov fs, ax
+    pop rax
+    mov es, ax
+    pop rax
+    mov ds, ax
+
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rdi
+    pop rsi
+    pop rbp
+    pop rsp
+    pop rdx
+    pop rcx
+    pop rbx
+
+    add rsp, 24
     iretq
