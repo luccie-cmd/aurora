@@ -11,7 +11,6 @@
 #include <arch/io/io.h>
 #include <stdio.h>
 #include <arch/syscall/syscall.h>
-#include <arch/mmu/mmu.h>
 #include <debug.h>
 
 void HalInitialize(){
@@ -28,8 +27,6 @@ void HalInitialize(){
     InitISR();
     printf("Initializing IRQ\n");
     InitIRQ();
-    printf("Initializing MMU\n");
-    InitMMU();
     // printf("Initializing ACPI\n");
     // InitACPI();
     // printf("Initializing File system\n");

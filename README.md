@@ -12,8 +12,6 @@ Aurora is by no means a perfect operating system, though it has been designed to
 - Any virtual machine that supports UEFI (qemu get's installed by default)
 
 # Building
-0. Run `$ install_deps.sh`  
-This will install all the needed dependecies including gcc, qemu, ovmf (uefi boot for qemu), python3, parted and mtools (for mkfs)
 1. Run [build.py](build.py)  
 this will read the configuration file from [script/config.py](script/config.py) and build a .img file that you can copy and paste into your USB  
 NOTE: If your want to install aurora on the main disk run the `install` command when it boots up, this will list all the devices with their sizes.
